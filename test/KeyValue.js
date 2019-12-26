@@ -1,3 +1,5 @@
+const assertRevert = require("./support/assertRevert");
+
 const KeyValueStore = artifacts.require("KeyValueStore");
 const colors = require("colors");
 
@@ -8,14 +10,20 @@ contract("KeyValueStore", async accounts => {
   const otherUser = accounts[1];
 
   beforeEach(async function() {
-    contract = await KeyValueStore.deployed("0x0adf");
+    contract = await KeyValueStore.deployed();
   });
 
-  describe("Store", () => {
-    it("should return 0 when no tokens", async () => {
-      let key = await contract.getEncSharedKey(owner);
-      console.log("kye:  ", key);
-      //assert.equal(await contract.getEncSharedKey(otherUser), 0);
+  describe("User auth", () => {
+    it("can get the sharedKey of the owner", async () => {
+      assert.equal(await contract.getEncSharedKey(owner), "0x30");
+    });
+
+    it("reverts on unauthorized user access", async () => {
+      await assertRevert(
+        contract.authorizeUser(otherUser, Buffer.from("1"),
+          { from: otherUser }
+        )
+      );
     });
   });
 });

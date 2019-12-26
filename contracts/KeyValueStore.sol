@@ -48,8 +48,7 @@ contract KeyValueStore {
     delete userKeys[user];
   }
 
-  // TODO: can be public
-  function getEncSharedKey(address user) view public restricted returns (bytes memory) {
+  function getEncSharedKey(address user) view public returns (bytes memory) {
     return userKeys[user];
   }
 }

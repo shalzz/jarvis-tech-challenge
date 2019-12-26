@@ -3,5 +3,5 @@ const KeyValueStore = artifacts.require("KeyValueStore");
 
 module.exports = function(deployer) {
   deployer.deploy(Migrations);
-  deployer.deploy(KeyValueStore);
+  deployer.deploy(KeyValueStore, Buffer.from("0"));
 };
