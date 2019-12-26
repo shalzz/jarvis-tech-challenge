@@ -8,13 +8,14 @@ contract KeyValueStore {
   // encrypted with that user's pub key
   mapping(address => bytes) userKeys;
 
-  address[] public authorizeUsers;
+  address[] public authorizedUsers;
 
   // Mapping from secretName to encryptedSecretValue
   mapping(bytes => bytes) secret;
 
-  constructor() public {
-    authorizeUser(msg.sender, new bytes(1));
+  constructor(bytes memory _encSharedKey) public {
+    userKeys[msg.sender] = _encSharedKey;
+    authorizedUsers.push(msg.sender);
   }
 
   /**
@@ -32,13 +33,15 @@ contract KeyValueStore {
       return userKeys[msg.sender].length != 0;
   }
 
+  /**** IAM ****/
+
   function listUsers() view public returns (address[] memory) {
-    return authorizeUsers;
+    return authorizedUsers;
   }
 
   function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
     userKeys[user] = encryptedSharedKey;
-    authorizeUsers.push(user);
+    authorizedUsers.push(user);
   }
 
   function removeUser(address user) public restricted {

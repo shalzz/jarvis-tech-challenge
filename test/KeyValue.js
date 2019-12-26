@@ -8,7 +8,7 @@ contract("KeyValueStore", async accounts => {
   const otherUser = accounts[1];
 
   beforeEach(async function() {
-    contract = await KeyValueStore.deployed();
+    contract = await KeyValueStore.deployed("0x0adf");
   });
 
   describe("Store", () => {
