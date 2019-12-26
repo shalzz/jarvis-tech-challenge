@@ -9,7 +9,7 @@ contract("KeyValueStore", async accounts => {
   const owner = accounts[0];
   const otherUser = accounts[1];
 
-  beforeEach(async function() {
+  before(async function() {
     contract = await KeyValueStore.deployed();
   });
 
@@ -24,6 +24,29 @@ contract("KeyValueStore", async accounts => {
           { from: otherUser }
         )
       );
+    });
+
+    it("existing user can add another user", async () => {
+      await contract.authorizeUser(otherUser, Buffer.from("1"),
+          { from: owner }
+      );
+    });
+
+    it("can list authorized users", async () => {
+      let res = await contract.listUsers();
+      assert.equal(res.length, 2);
+      assert.equal(res[0], owner);
+      assert.equal(res[1], otherUser);
+    });
+
+    it("existing user can remove another user", async () => {
+      await contract.removeUser(otherUser,
+          { from: owner }
+      );
+      let res = await contract.listUsers();
+      assert.equal(res.length, 2); // length stays the same, unfortunately.
+      assert.equal(res[0], owner);
+      assert.equal(res[1], "0x0000000000000000000000000000000000000000");
     });
   });
 });

@@ -35,10 +35,6 @@ contract KeyValueStore {
 
   /**** IAM ****/
 
-  function listUsers() view public returns (address[] memory) {
-    return authorizedUsers;
-  }
-
   function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
     userKeys[user] = encryptedSharedKey;
     authorizedUsers.push(user);
@@ -46,6 +42,18 @@ contract KeyValueStore {
 
   function removeUser(address user) public restricted {
     delete userKeys[user];
+    // Kludgey. Maybe we can have a better data struct to avoid this
+    for (uint i = 0; i < authorizedUsers.length; i++){
+      if (authorizedUsers[i] == user) {
+        delete authorizedUsers[i];
+      }
+    }
+  }
+
+  /**** Unrestricted functions *****/
+
+  function listUsers() view public returns (address[] memory) {
+    return authorizedUsers;
   }
 
   function getEncSharedKey(address user) view public returns (bytes memory) {
