@@ -11,7 +11,7 @@ contract KeyValueStore {
   address[] public authorizedUsers;
 
   // Mapping from secretName to encryptedSecretValue
-  mapping(bytes => bytes) secret;
+  mapping(bytes => bytes) secrets;
 
   constructor(bytes memory _encSharedKey) public {
     userKeys[msg.sender] = _encSharedKey;
@@ -48,6 +48,10 @@ contract KeyValueStore {
         delete authorizedUsers[i];
       }
     }
+  }
+
+  function addSecret(bytes memory name, bytes memory value) public restricted {
+    secrets[name] = value;
   }
 
   /**** Unrestricted functions *****/
