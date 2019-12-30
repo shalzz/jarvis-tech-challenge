@@ -8,7 +8,7 @@ contract KeyValueStore {
   // encrypted with that user's pub key
   mapping(address => bytes) userKeys;
 
-  address[] public authorizedUsers;
+  address[] authorizedUsers;
 
   // Mapping from secretName to encryptedSecretValue
   mapping(bytes => bytes) secrets;
