@@ -1,12 +1,12 @@
 pragma solidity >=0.4.21 <0.7.0;
 
-import "./interface/StorageInterface.sol";
+import "./EternalStorage.sol";
 
 contract KeyValueStore {
 
   /*** STORAGE ***/
 
-  StorageInterface eternalStorage = StorageInterface(0);
+  EternalStorage eternalStorage = EternalStorage(0);
 
   address[] authorizedUsers;
 
@@ -21,9 +21,10 @@ contract KeyValueStore {
       _;
   }
 
-  constructor(bytes memory _encSharedKey) public {
+  constructor(bytes memory _encSharedKey, address _storageAddress) public {
+    eternalStorage = EternalStorage(_storageAddress);
     setEncSharedKey(msg.sender, _encSharedKey);
-    authorizedUsers.push(msg.sender);
+    //authorizedUsers.push(msg.sender);
   }
 
   /**** IAM ****/

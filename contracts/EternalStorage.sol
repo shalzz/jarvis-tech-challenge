@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity 0.5.8;
 
 contract EternalStorage {
 
@@ -13,7 +13,8 @@ contract EternalStorage {
     mapping(bytes32 => int) intStorage;
 
     modifier onlyLatestVersion() {
-       require(msg.sender == latestVersion);
+       require(msg.sender == latestVersion,
+               "onlyLatestVersion: caller is not the latestVersion");
         _;
     }
 
@@ -52,7 +53,7 @@ contract EternalStorage {
         uIntStorage[_key] = _value;
     }
 
-    function setString(bytes32 _key, string calldata _value) onlyLatestVersion external {
+    function setString(bytes32 _key, string memory _value) onlyLatestVersion public {
         stringStorage[_key] = _value;
     }
 
@@ -60,7 +61,7 @@ contract EternalStorage {
         addressStorage[_key] = _value;
     }
 
-    function setBytes(bytes32 _key, bytes calldata _value) onlyLatestVersion external {
+    function setBytes(bytes32 _key, bytes memory _value) onlyLatestVersion public {
         bytesStorage[_key] = _value;
     }
 
