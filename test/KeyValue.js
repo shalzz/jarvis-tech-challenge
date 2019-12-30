@@ -1,6 +1,6 @@
 const assertRevert = require("./support/assertRevert");
 
-const KeyValueStore = artifacts.require("KeyValueStore");
+const KeyValueDelegate = artifacts.require("KeyValueDelegate");
 const colors = require("colors");
 
 contract("KeyValueStore", async accounts => {
@@ -10,7 +10,7 @@ contract("KeyValueStore", async accounts => {
   const otherUser = accounts[1];
 
   before(async function() {
-    contract = await KeyValueStore.deployed();
+    contract = await KeyValueDelegate.deployed();
   });
 
   describe("User auth", () => {

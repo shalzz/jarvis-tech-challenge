@@ -1,78 +1,104 @@
-pragma solidity >=0.4.21 <0.7.0;
-
-import "./EternalStorage.sol";
+pragma solidity 0.5.8;
 
 contract KeyValueStore {
 
-  /*** STORAGE ***/
+    address owner = msg.sender;
+    address latestVersion;
 
-  EternalStorage eternalStorage = EternalStorage(0);
+    mapping(bytes32 => uint) uIntStorage;
+    mapping(bytes32 => string) stringStorage;
+    mapping(bytes32 => address) addressStorage;
+    mapping(bytes32 => bytes) bytesStorage;
+    mapping(bytes32 => bool) boolStorage;
+    mapping(bytes32 => int) intStorage;
 
-  address[] authorizedUsers;
-
-  /**
-   * @dev Throws if called by any account not authorized.
-   */
-  modifier restricted() {
-      require(
-        getEncSharedKey(msg.sender).length != 0,
-        "restricted: caller is not authorized"
-      );
-      _;
-  }
-
-  constructor(bytes memory _encSharedKey, address _storageAddress) public {
-    eternalStorage = EternalStorage(_storageAddress);
-    setEncSharedKey(msg.sender, _encSharedKey);
-    //authorizedUsers.push(msg.sender);
-  }
-
-  /**** IAM ****/
-
-  function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
-    setEncSharedKey(user, encryptedSharedKey);
-    authorizedUsers.push(user);
-  }
-
-  function removeUser(address user) public restricted {
-    deleteEncSharedKey(user);
-    // Kludgey. Maybe we can have a better data struct to avoid this
-    for (uint i = 0; i < authorizedUsers.length; i++){
-      if (authorizedUsers[i] == user) {
-        delete authorizedUsers[i];
-      }
+    modifier onlyLatestVersion() {
+      // The owner and other contracts are only allowed to set the storage upon deployment to register the initial contracts/settings, afterwards their direct access is disabled
+        if (latestVersion != address(0)) {
+            // Make sure the access is permitted to only contracts in our Dapp
+            require(msg.sender == latestVersion,
+               "onlyLatestVersion: caller is not the latestVersion");
+        }
+        _;
     }
-  }
 
-  function addSecret(bytes memory name, bytes memory value) public restricted {
-    setSecret(name, value);
-  }
+    function upgradeVersion(address _newVersion) public {
+        require(msg.sender == owner, "upgradeVersion: caller is not the owner");
+        latestVersion = _newVersion;
+    }
 
-  /**** Unrestricted functions *****/
+    // *** Getter Methods ***
+    function getUint(bytes32 _key) external view returns(uint) {
+        return uIntStorage[_key];
+    }
 
-  function listUsers() view public returns (address[] memory) {
-    return authorizedUsers;
-  }
+    function getString(bytes32 _key) external view returns(string memory) {
+        return stringStorage[_key];
+    }
 
-  /***** Helpers *****/
+    function getAddress(bytes32 _key) external view returns(address) {
+        return addressStorage[_key];
+    }
 
-  function getEncSharedKey(address user) view public returns (bytes memory) {
-    return eternalStorage.getBytes(keccak256(abi.encodePacked("userkeys", user)));
-  }
+    function getBytes(bytes32 _key) external view returns(bytes memory) {
+        return bytesStorage[_key];
+    }
 
-  function setEncSharedKey(address user, bytes memory encryptedSharedKey) internal {
-    eternalStorage.setBytes(keccak256(abi.encodePacked("userkeys", user)), encryptedSharedKey);
-  }
+    function getBool(bytes32 _key) external view returns(bool) {
+        return boolStorage[_key];
+    }
 
-  function deleteEncSharedKey(address user) internal {
-    eternalStorage.deleteBytes(keccak256(abi.encodePacked("userkeys", user)));
-  }
+    function getInt(bytes32 _key) external view returns(int) {
+        return intStorage[_key];
+    }
 
-  function getSecret(bytes memory name) view public returns (bytes memory) {
-    return eternalStorage.getBytes(keccak256(abi.encodePacked("secrets", name)));
-  }
+    // *** Setter Methods ***
+    function setUint(bytes32 _key, uint _value) onlyLatestVersion external {
+        uIntStorage[_key] = _value;
+    }
 
-  function setSecret(bytes memory name, bytes memory value) internal {
-    eternalStorage.setBytes(keccak256(abi.encodePacked("secrets", name)), value);
-  }
+    function setString(bytes32 _key, string memory _value) onlyLatestVersion public {
+        stringStorage[_key] = _value;
+    }
+
+    function setAddress(bytes32 _key, address _value) onlyLatestVersion external {
+        addressStorage[_key] = _value;
+    }
+
+    function setBytes(bytes32 _key, bytes memory _value) onlyLatestVersion public {
+        bytesStorage[_key] = _value;
+    }
+
+    function setBool(bytes32 _key, bool _value) onlyLatestVersion external {
+        boolStorage[_key] = _value;
+    }
+
+    function setInt(bytes32 _key, int _value) onlyLatestVersion external {
+        intStorage[_key] = _value;
+    }
+
+    // *** Delete Methods ***
+    function deleteUint(bytes32 _key) onlyLatestVersion external {
+        delete uIntStorage[_key];
+    }
+
+    function deleteString(bytes32 _key) onlyLatestVersion external {
+        delete stringStorage[_key];
+    }
+
+    function deleteAddress(bytes32 _key) onlyLatestVersion external {
+        delete addressStorage[_key];
+    }
+
+    function deleteBytes(bytes32 _key) onlyLatestVersion external {
+        delete bytesStorage[_key];
+    }
+
+    function deleteBool(bytes32 _key) onlyLatestVersion external {
+        delete boolStorage[_key];
+    }
+
+    function deleteInt(bytes32 _key) onlyLatestVersion external {
+        delete intStorage[_key];
+    }
 }

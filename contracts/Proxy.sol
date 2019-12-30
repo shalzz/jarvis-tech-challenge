@@ -1,22 +1,21 @@
 pragma solidity >=0.4.21 <0.7.0;
 
 contract Proxy {
+  function implementation() public view returns (address);
 
-    address delegate;
-    address owner = msg.sender;
+  function () external payable {
+    address _impl = implementation();
+    require(_impl != address(0));
+    bytes memory data = msg.data;
 
-    function upgradeDelegate(address newDelegateAddress) public {
-        require(msg.sender == owner);
-        delegate = newDelegateAddress;
+    assembly {
+      let result := delegatecall(gas, _impl, add(data, 0x20), mload(data), 0, 0)
+      let size := returndatasize
+      let ptr := mload(0x40)
+      returndatacopy(ptr, 0, size)
+      switch result
+      case 0 { revert(ptr, size) }
+      default { return(ptr, size) }
     }
-
-    function() external payable {
-        assembly {
-            let _target := sload(0)
-            calldatacopy(0x0, 0x0, calldatasize)
-            let result := delegatecall(gas, _target, 0x0, calldatasize, 0x0, 0)
-            returndatacopy(0x0, 0x0, returndatasize)
-            switch result case 0 {revert(0, 0)} default {return (0, returndatasize)}
-        }
-    }
+  }
 }
