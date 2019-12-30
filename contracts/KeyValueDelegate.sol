@@ -3,7 +3,7 @@ pragma solidity >=0.4.21 <0.7.0;
 import "./DelegateStorage.sol";
 import "./UpgradeabilityProxy.sol";
 
-contract KeyValueDelegate is UpgradeabilityProxy, DelegateStorage {
+contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
   /*** STORAGE ***/
 
