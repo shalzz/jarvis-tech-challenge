@@ -1,47 +1,40 @@
 pragma solidity >=0.4.21 <0.7.0;
 
+import "./interface/StorageInterface.sol";
+
 contract KeyValueStore {
 
   /*** STORAGE ***/
 
-  // Mapping from user to sharedKey
-  // encrypted with that user's pub key
-  mapping(address => bytes) userKeys;
+  StorageInterface eternalStorage = StorageInterface(0);
 
   address[] authorizedUsers;
-
-  // Mapping from secretName to encryptedSecretValue
-  mapping(bytes => bytes) secrets;
-
-  constructor(bytes memory _encSharedKey) public {
-    userKeys[msg.sender] = _encSharedKey;
-    authorizedUsers.push(msg.sender);
-  }
 
   /**
    * @dev Throws if called by any account not authorized.
    */
   modifier restricted() {
-      require(isAuthorized(), "restricted: caller is not authorized");
+      require(
+        getEncSharedKey(msg.sender).length != 0,
+        "restricted: caller is not authorized"
+      );
       _;
   }
 
-  /**
-   * @dev Returns true if the caller is authorized.
-   */
-  function isAuthorized() public view returns (bool) {
-      return userKeys[msg.sender].length != 0;
+  constructor(bytes memory _encSharedKey) public {
+    setEncSharedKey(msg.sender, _encSharedKey);
+    authorizedUsers.push(msg.sender);
   }
 
   /**** IAM ****/
 
   function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
-    userKeys[user] = encryptedSharedKey;
+    setEncSharedKey(user, encryptedSharedKey);
     authorizedUsers.push(user);
   }
 
   function removeUser(address user) public restricted {
-    delete userKeys[user];
+    deleteEncSharedKey(user);
     // Kludgey. Maybe we can have a better data struct to avoid this
     for (uint i = 0; i < authorizedUsers.length; i++){
       if (authorizedUsers[i] == user) {
@@ -51,7 +44,7 @@ contract KeyValueStore {
   }
 
   function addSecret(bytes memory name, bytes memory value) public restricted {
-    secrets[name] = value;
+    setSecret(name, value);
   }
 
   /**** Unrestricted functions *****/
@@ -60,7 +53,25 @@ contract KeyValueStore {
     return authorizedUsers;
   }
 
+  /***** Helpers *****/
+
   function getEncSharedKey(address user) view public returns (bytes memory) {
-    return userKeys[user];
+    return eternalStorage.getBytes(keccak256(abi.encodePacked("userkeys", user)));
+  }
+
+  function setEncSharedKey(address user, bytes memory encryptedSharedKey) internal {
+    eternalStorage.setBytes(keccak256(abi.encodePacked("userkeys", user)), encryptedSharedKey);
+  }
+
+  function deleteEncSharedKey(address user) internal {
+    eternalStorage.deleteBytes(keccak256(abi.encodePacked("userkeys", user)));
+  }
+
+  function getSecret(bytes memory name) view public returns (bytes memory) {
+    return eternalStorage.getBytes(keccak256(abi.encodePacked("secrets", name)));
+  }
+
+  function setSecret(bytes memory name, bytes memory value) internal {
+    eternalStorage.setBytes(keccak256(abi.encodePacked("secrets", name)), value);
   }
 }
