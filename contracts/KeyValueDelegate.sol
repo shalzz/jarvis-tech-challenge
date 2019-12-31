@@ -5,6 +5,9 @@ import "./UpgradeabilityProxy.sol";
 
 contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
+  event Authorized(address indexed user);
+  event Deauthorized(address indexed user);
+
   /**
    * @dev Throws if called by any account not authorized.
    */
@@ -19,34 +22,23 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
   constructor(bytes memory _encSharedKey, address _storageAddress) public {
     keyValueStore = KeyValueStore(_storageAddress);
     setEncSharedKey(msg.sender, _encSharedKey);
-    authorizedUsers.push(msg.sender);
+    emit Authorized(msg.sender);
   }
 
   /**** IAM ****/
 
   function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
     setEncSharedKey(user, encryptedSharedKey);
-    authorizedUsers.push(user);
+    emit Authorized(user);
   }
 
   function removeUser(address user) public restricted {
     deleteEncSharedKey(user);
-    // Kludgey. Maybe we can have a better data struct to avoid this
-    for (uint i = 0; i < authorizedUsers.length; i++){
-      if (authorizedUsers[i] == user) {
-        delete authorizedUsers[i];
-      }
-    }
+    emit Deauthorized(user);
   }
 
   function addSecret(bytes memory name, bytes memory value) public restricted {
     setSecret(name, value);
-  }
-
-  /**** Unrestricted functions *****/
-
-  function listUsers() view public returns (address[] memory) {
-    return authorizedUsers;
   }
 
   /***** Helpers *****/

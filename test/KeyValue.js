@@ -35,21 +35,11 @@ contract("KeyValueStore", async accounts => {
       );
     });
 
-    it("can list authorized users", async () => {
-      let res = await contract.listUsers();
-      assert.equal(res.length, 2);
-      assert.equal(res[0], owner);
-      assert.equal(res[1], otherUser);
-    });
-
     it("existing user can remove another user", async () => {
       await contract.removeUser(otherUser,
           { from: owner }
       );
-      let res = await contract.listUsers();
-      assert.equal(res.length, 2); // length stays the same, unfortunately.
-      assert.equal(res[0], owner);
-      assert.equal(res[1], "0x0000000000000000000000000000000000000000");
+      //assert.equal(res.length, 2); // length stays the same, unfortunately.
     });
   });
 });

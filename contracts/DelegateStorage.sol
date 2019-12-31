@@ -4,5 +4,4 @@ import "./KeyValueStore.sol";
 
 contract DelegateStorage {
   KeyValueStore keyValueStore = KeyValueStore(0);
-  address[] authorizedUsers;
 }
