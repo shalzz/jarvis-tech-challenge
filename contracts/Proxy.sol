@@ -5,7 +5,7 @@ contract Proxy {
 
   function () external payable {
     address _impl = implementation();
-    require(_impl != address(0));
+    require(_impl != address(0), "impl is empty");
     bytes memory data = msg.data;
 
     assembly {

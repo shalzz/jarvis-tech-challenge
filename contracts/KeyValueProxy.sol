@@ -4,4 +4,9 @@ import "./UpgradeabilityProxy.sol";
 import "./DelegateStorage.sol";
 import "./KeyValueStore.sol";
 
-contract KeyValueProxy is UpgradeabilityProxy, DelegateStorage {}
+contract KeyValueProxy is UpgradeabilityProxy, DelegateStorage {
+
+  constructor(address _storageAddress) public {
+    keyValueStore = KeyValueStore(_storageAddress);
+  }
+}

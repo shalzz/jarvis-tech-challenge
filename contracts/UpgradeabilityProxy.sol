@@ -21,7 +21,7 @@ contract UpgradeabilityProxy is Proxy, UpgradeabilityStorage {
 
   function upgradeTo(string memory version, address implementation) public {
     require(_owner == msg.sender, "owner: caller is not the owner");
-    require(_implementation != implementation);
+    require(_implementation != implementation, "proxy: upgrading to the same impl");
     _version = version;
     _implementation = implementation;
     emit Upgraded(version, implementation);

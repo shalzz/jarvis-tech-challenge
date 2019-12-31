@@ -3,5 +3,6 @@ pragma solidity >=0.4.21 <0.7.0;
 import "./KeyValueStore.sol";
 
 contract DelegateStorage {
-  KeyValueStore eternalStorage = KeyValueStore(0);
+  KeyValueStore keyValueStore = KeyValueStore(0);
+  address[] authorizedUsers;
 }

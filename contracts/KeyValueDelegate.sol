@@ -5,10 +5,6 @@ import "./UpgradeabilityProxy.sol";
 
 contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
-  /*** STORAGE ***/
-
-  address[] authorizedUsers;
-
   /**
    * @dev Throws if called by any account not authorized.
    */
@@ -21,7 +17,7 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
   }
 
   constructor(bytes memory _encSharedKey, address _storageAddress) public {
-    eternalStorage = KeyValueStore(_storageAddress);
+    keyValueStore = KeyValueStore(_storageAddress);
     setEncSharedKey(msg.sender, _encSharedKey);
     authorizedUsers.push(msg.sender);
   }
@@ -56,22 +52,22 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
   /***** Helpers *****/
 
   function getEncSharedKey(address user) view public returns (bytes memory) {
-    return eternalStorage.getBytes(keccak256(abi.encodePacked("userkeys", user)));
+    return keyValueStore.getBytes(keccak256(abi.encodePacked("userkeys", user)));
   }
 
   function setEncSharedKey(address user, bytes memory encryptedSharedKey) internal {
-    eternalStorage.setBytes(keccak256(abi.encodePacked("userkeys", user)), encryptedSharedKey);
+    keyValueStore.setBytes(keccak256(abi.encodePacked("userkeys", user)), encryptedSharedKey);
   }
 
   function deleteEncSharedKey(address user) internal {
-    eternalStorage.deleteBytes(keccak256(abi.encodePacked("userkeys", user)));
+    keyValueStore.deleteBytes(keccak256(abi.encodePacked("userkeys", user)));
   }
 
   function getSecret(bytes memory name) view public returns (bytes memory) {
-    return eternalStorage.getBytes(keccak256(abi.encodePacked("secrets", name)));
+    return keyValueStore.getBytes(keccak256(abi.encodePacked("secrets", name)));
   }
 
   function setSecret(bytes memory name, bytes memory value) internal {
-    eternalStorage.setBytes(keccak256(abi.encodePacked("secrets", name)), value);
+    keyValueStore.setBytes(keccak256(abi.encodePacked("secrets", name)), value);
   }
 }
