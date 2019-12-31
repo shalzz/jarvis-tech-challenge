@@ -30,16 +30,17 @@ contract("KeyValueStore", async accounts => {
     });
 
     it("existing user can add another user", async () => {
-      await contract.authorizeUser(otherUser, Buffer.from("1"),
+      let res = await contract.authorizeUser(otherUser, Buffer.from("1"),
           { from: owner }
       );
+      assert.equal(res.logs[0].event, "Authorized");
     });
 
     it("existing user can remove another user", async () => {
-      await contract.removeUser(otherUser,
+      let res = await contract.removeUser(otherUser,
           { from: owner }
       );
-      //assert.equal(res.length, 2); // length stays the same, unfortunately.
+      assert.equal(res.logs[0].event, "Deauthorized");
     });
   });
 });
