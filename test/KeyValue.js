@@ -4,6 +4,7 @@ const assertRevert = require("./support/assertRevert");
 
 const KeyValueDelegate = artifacts.require("KeyValueDelegate");
 const KeyValueProxy = artifacts.require("KeyValueProxy");
+const KeyValueStore = artifacts.require("KeyValueStore");
 
 contract("KeyValueStore", async accounts => {
   let contract;
@@ -41,6 +42,18 @@ contract("KeyValueStore", async accounts => {
           { from: owner }
       );
       assert.equal(res.logs[0].event, "Deauthorized");
+    });
+  });
+
+
+  describe("Proxy ", () => {
+    it("can upgrade", async () => {
+      let newContract = await KeyValueDelegate.new();
+      let proxy = await KeyValueProxy.deployed();
+      proxy.upgradeTo("0.2", newContract.address);
+
+      assert.equal(await proxy.version(), "0.2");
+      assert.equal(await contract.getEncSharedKey(owner), "0x30");
     });
   });
 });

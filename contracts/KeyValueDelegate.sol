@@ -5,9 +5,6 @@ import "./UpgradeabilityProxy.sol";
 
 contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
-  event Authorized(address indexed user);
-  event Deauthorized(address indexed user);
-
   /**
    * @dev Throws if called by any account not authorized.
    */
@@ -17,12 +14,6 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
         "restricted: caller is not authorized"
       );
       _;
-  }
-
-  constructor(bytes memory _encSharedKey, address _storageAddress) public {
-    keyValueStore = KeyValueStore(_storageAddress);
-    setEncSharedKey(msg.sender, _encSharedKey);
-    emit Authorized(msg.sender);
   }
 
   /**** IAM ****/

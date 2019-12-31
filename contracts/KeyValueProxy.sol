@@ -6,7 +6,9 @@ import "./KeyValueStore.sol";
 
 contract KeyValueProxy is UpgradeabilityProxy, DelegateStorage {
 
-  constructor(address _storageAddress) public {
+  constructor(address _storageAddress, bytes memory _encSharedKey) public {
     keyValueStore = KeyValueStore(_storageAddress);
+    keyValueStore.setBytes(keccak256(abi.encodePacked("userkeys", msg.sender)), _encSharedKey);
+    emit Authorized(msg.sender); //TODO: remove?
   }
 }
