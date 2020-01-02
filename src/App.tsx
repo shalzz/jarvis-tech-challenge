@@ -5,7 +5,7 @@ import getWeb3 from "./util/getWeb3";
 const appStyles = require("./App.css");
 const logo = require("./logo.svg");
 
-import MetaWallet from "./components/MetaWallet";
+import DeployContracts from "./components/DeployContracts";
 
 interface IAppState {
   web3: Web3;
@@ -49,7 +49,7 @@ class App extends React.Component<{}, IAppState> {
             <p>Web3 is loading</p>}
         </div>
         <hr />
-        {this.state.web3 ? <MetaWallet web3={this.state.web3} /> : null}
+        {this.state.web3 ? <DeployContracts web3={this.state.web3} /> : null}
       </div>
     );
   }

@@ -4,7 +4,19 @@ let p: Promise<Web3>;
 
 const getWeb3 = (): Promise<Web3> => {
   if (!p) {
-    p = new Promise<Web3>((resolve, reject) => {
+    p = new Promise<Web3>(async (resolve, reject) => {
+      // Modern dapp browsers...
+      if ((window as any).ethereum) {
+        const web3 = new Web3((window as any).ethereum);
+        try {
+          // Request account access if needed
+          await (window as any).ethereum.enable();
+          // Acccounts now exposed
+          resolve(web3);
+        } catch (error) {
+          reject(error);
+        }
+      }
       // Wait for loading completion to avoid race conditions with web3 injection timing.
       window.addEventListener("load", () => {
         let web3: Web3 = (window as any).web3 as Web3;
