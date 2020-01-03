@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Web3 from "web3";
+import Web3 from "web3";
 import getWeb3 from "./util/getWeb3";
 
 const appStyles = require("./App.css");

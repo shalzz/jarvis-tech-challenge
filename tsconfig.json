@@ -14,11 +14,12 @@
     "alwaysStrict": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true
   },
   "include": [
     "src",
-    "webpack.config.ts",
-    "node_modules/web3-typescript-typings/index.d.ts"
+    "webpack.config.ts"
   ]
 }

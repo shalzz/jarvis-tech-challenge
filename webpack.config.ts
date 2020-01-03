@@ -107,8 +107,6 @@ if (isProd()) {
     new webpack.DefinePlugin({
       "process.env": { NODE_ENV: JSON.stringify("production") },
     }),
-    // minify
-    new webpack.optimize.UglifyJsPlugin(),
   ]);
 } else {
   // Development build tweaks

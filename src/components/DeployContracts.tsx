@@ -1,6 +1,7 @@
 import * as React from "react";
-import * as TruffleContract from "truffle-contract";
-import * as Web3 from "web3";
+import TruffleContract from "truffle-contract";
+import Web3 from "web3";
+//import {createEncryptedSharedKey} from "../util/helpers";
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
 const Proxy = TruffleContract(require("../../build/contracts/KeyValueProxy.json"));
@@ -27,7 +28,8 @@ export default class DeployContracts extends React.Component<IDeployContractsPro
   }
 
   public onDeploy = async (event) => {
-    if (this.props.web3.eth.accounts.length === 0) {
+    const accounts = await this.props.web3.eth.getAccounts();
+    if (accounts.length === 0) {
       this.setState({
         account: "",
         accountError: true,
@@ -38,15 +40,17 @@ export default class DeployContracts extends React.Component<IDeployContractsPro
     Delegate.setProvider(this.props.web3.currentProvider);
     Proxy.setProvider(this.props.web3.currentProvider);
     Storage.setProvider(this.props.web3.currentProvider);
-    let account = this.props.web3.eth.accounts[0];
+    const account = accounts[0];
     let instance: any;
 
     try {
-      let store = await Storage.new({from: account});
-      let proxy = await Proxy.new(store.address, Buffer.from("0"), {from: account});
+      const store = await Storage.new({from: account});
+      const delegate = await Delegate.new({from: account});
+      const proxy = await Proxy.new(store.address, Buffer.from("0"), {from: account});
+
       await store.upgradeVersion(proxy.address, {from: account});
-      instance = await Delegate.new({from: account});
-      proxy.upgradeTo("0.1", instance.address, {from: account});
+      await proxy.upgradeTo("0.1", delegate.address, {from: account});
+      instance = proxy;
     } catch (err) {
       console.error(err);
       alert(JSON.stringify(err));
