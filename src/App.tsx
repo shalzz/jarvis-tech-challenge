@@ -19,7 +19,7 @@ class App extends React.Component<{}, IAppState> {
     };
   }
 
-  public async componentWillMount() {
+  public async componentDidMount() {
     const web3 = await getWeb3();
     this.setState({
       web3,

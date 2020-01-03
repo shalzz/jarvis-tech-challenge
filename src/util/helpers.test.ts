@@ -1,6 +1,10 @@
+/**
+ * @jest-environment node
+ */
+
 import EthCrypto from 'eth-crypto';
 import Web3 from "web3";
-const TruffleContract = require("@truffle/contract");;
+const TruffleContract = require("@truffle/contract");
 
 import {createEncryptedSharedKey} from "./helpers";
 
@@ -24,8 +28,10 @@ beforeAll(async () => {
 it("can create a new sharedKey", async () => {
   const store = await Storage.new({from: accounts[0]});
   const delegate = await Delegate.new({from: accounts[0]});
-  const sharedKey = createEncryptedSharedKey(identity);
-  const proxy = await Proxy.new(store.address, sharedKey, {from: accounts[0]});
+  const sharedKey = await createEncryptedSharedKey(identity);
+  console.log(sharedKey);
+  const proxy = await Proxy.new(store.address, Buffer.from(JSON.stringify(sharedKey)), {from: accounts[0]});
+  console.log(proxy.address);
 
   await store.upgradeVersion(proxy.address, {from: accounts[0]});
   await proxy.upgradeTo("0.1", delegate.address, {from: accounts[0]});

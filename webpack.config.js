@@ -1,21 +1,44 @@
 // tslint:disable:no-implicit-dependencies
-import * as path from "path";
-import * as webpack from "webpack";
+const path = require('path')
+const webpack = require('webpack')
 
 // webpack plugins
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 // postcss plugins
 const autoprefixer = require("autoprefixer");
 
-const isProd = (): boolean => {
+const mode = process.env.NODE_ENV || 'production'
+const isProd = function() {
   return process.env.NODE_ENV === "production";
 };
 
-const buildConfig: webpack.Configuration = {
+const buildConfig = {
+  output: {
+    filename: "[name].js",
+    publicPath: "/",
+    path: path.join(__dirname, "build/app"),
+  },
   entry: {
     bundle: path.join(__dirname, "src/index.tsx"),
-    vendor_bundle: ["react", "react-dom", "web3", "eth-crytpo", "@truffle/contract", "bluebird", "ethereumjs-util"],
+    vendor_bundle: ["react", "react-dom", "web3", "eth-crypto", "@truffle/contract", "bluebird", "ethereumjs-util"],
   },
+  mode,
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+  },
+  plugins: [
+    // exclude locale files in moment
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // copy files in public to build
+    new CopyWebpackPlugin([{
+      context: "public",
+      from: {
+        dot: false,
+        glob: "**/*",
+      },
+      to: path.join(__dirname, "build/app/"),
+    }]),
+  ],
   module: {
     rules: [
       // compile ts
@@ -71,33 +94,6 @@ const buildConfig: webpack.Configuration = {
         },
       },
     ],
-    target: "web"
-  } as webpack.NewModule,
-  output: {
-    filename: "[name].js",
-    publicPath: "/",
-    path: path.join(__dirname, "build/app"),
-  },
-  plugins: [
-    // exclude locale files in moment
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // pack vendor chunk
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "vendor_bundle",
-      minChunks: Infinity,
-    }),
-    // copy files in public to build
-    new CopyWebpackPlugin([{
-      context: "public",
-      from: {
-        dot: false,
-        glob: "**/*",
-      },
-      to: path.join(__dirname, "build/app/"),
-    }]),
-  ],
-  resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"],
   },
 };
 
@@ -111,7 +107,8 @@ if (isProd()) {
   ]);
 } else {
   // Development build tweaks
-  const buildConfigModule = buildConfig.module as webpack.NewModule;
+  buildConfig.devtool = "source-map";
+  const buildConfigModule = buildConfig.module;
   buildConfigModule.rules = (buildConfigModule.rules || []).concat([
     // tslint
     {
@@ -133,4 +130,4 @@ if (isProd()) {
   ]);
 }
 
-export default buildConfig;
+module.exports = buildConfig;

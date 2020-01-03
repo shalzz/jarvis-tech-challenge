@@ -19,7 +19,6 @@
     "esModuleInterop": true
   },
   "include": [
-    "src",
-    "webpack.config.ts"
+    "src"
   ]
 }
