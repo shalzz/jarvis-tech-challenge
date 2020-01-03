@@ -1,9 +1,8 @@
 import EthCrypto from 'eth-crypto';
-import TruffleContract from "truffle-contract";
 import Web3 from "web3";
+const TruffleContract = require("@truffle/contract");;
 
 import {createEncryptedSharedKey} from "./helpers";
-
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
 const Proxy = TruffleContract(require("../../build/contracts/KeyValueProxy.json"));

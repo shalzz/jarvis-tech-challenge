@@ -1,6 +1,6 @@
 import * as React from "react";
-import TruffleContract from "truffle-contract";
 import Web3 from "web3";
+const TruffleContract = require("@truffle/contract");;
 //import {createEncryptedSharedKey} from "../util/helpers";
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
