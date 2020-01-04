@@ -20,7 +20,7 @@ const buildConfig = {
   },
   entry: {
     bundle: path.join(__dirname, "src/index.tsx"),
-    vendor_bundle: ["react", "react-dom", "web3", "eth-crypto", "@truffle/contract", "bluebird", "ethereumjs-util"],
+    vendor_bundle: ["react", "react-dom", "web3", "eth-crypto", "@truffle/contract"],
   },
   mode,
   resolve: {
