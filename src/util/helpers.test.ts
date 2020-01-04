@@ -6,7 +6,12 @@ import EthCrypto from 'eth-crypto';
 import Web3 from "web3";
 const TruffleContract = require("@truffle/contract");
 
-import {createEncryptedSharedKey, addUser} from "./helpers";
+import {
+  createEncryptedSharedKey,
+  addUser,
+  addSecret,
+  getSecret
+} from "./helpers";
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
 const Proxy = TruffleContract(require("../../build/contracts/KeyValueProxy.json"));
@@ -22,6 +27,9 @@ let owner;
 let newUser;
 
 let contract;
+
+const secretName = "mysecret";
+const secretValue = "secret"
 
 beforeAll(async () => {
   Delegate.setProvider(provider);
@@ -46,4 +54,18 @@ it("can create a new sharedKey", async () => {
 
 it("can add a new user", async () => {
   await addUser(contract, newUser, identity2.publicKey, owner, identity.privateKey);
+});
+
+it("can add a new secret", async () => {
+  await addSecret(contract, secretName, secretValue, owner, identity.privateKey);
+});
+
+it("can get our secret", async () => {
+  const secret = await getSecret(contract, secretName, owner, identity.privateKey);
+  expect(secret).toBe(secretValue);
+});
+
+it("can get our secret from another User", async () => {
+  const secret = await getSecret(contract, secretName, newUser, identity2.privateKey);
+  expect(secret).toBe(secretValue);
 });
