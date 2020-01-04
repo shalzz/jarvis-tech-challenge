@@ -6,7 +6,7 @@ import EthCrypto from 'eth-crypto';
 import Web3 from "web3";
 const TruffleContract = require("@truffle/contract");
 
-import {createEncryptedSharedKey} from "./helpers";
+import {createEncryptedSharedKey, addUser} from "./helpers";
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
 const Proxy = TruffleContract(require("../../build/contracts/KeyValueProxy.json"));
@@ -16,23 +16,34 @@ const provider = require("ganache-cli").provider();
 const web3 = new Web3(provider);
 
 const identity = EthCrypto.createIdentity();
-let accounts;
+const identity2 = EthCrypto.createIdentity();
+
+let owner;
+let newUser;
+
+let contract;
 
 beforeAll(async () => {
   Delegate.setProvider(provider);
   Proxy.setProvider(provider);
   Storage.setProvider(provider);
-  accounts = await web3.eth.getAccounts();
+  const accounts = await web3.eth.getAccounts();
+  owner = accounts[0];
+  newUser = accounts[1];
 });
 
 it("can create a new sharedKey", async () => {
-  const store = await Storage.new({from: accounts[0]});
-  const delegate = await Delegate.new({from: accounts[0]});
+  const store = await Storage.new({from: owner});
+  const delegate = await Delegate.new({from: owner});
   const sharedKey = await createEncryptedSharedKey(identity);
-  console.log(sharedKey);
-  const proxy = await Proxy.new(store.address, Buffer.from(JSON.stringify(sharedKey)), {from: accounts[0]});
-  console.log(proxy.address);
+  const proxy = await Proxy.new(store.address, Buffer.from(JSON.stringify(sharedKey)), {from: owner});
 
-  await store.upgradeVersion(proxy.address, {from: accounts[0]});
-  await proxy.upgradeTo("0.1", delegate.address, {from: accounts[0]});
+  await store.upgradeVersion(proxy.address, {from: owner});
+  await proxy.upgradeTo("0.1", delegate.address, {from: owner});
+  contract = await Delegate.at(proxy.address);
+});
+
+
+it("can add a new user", async () => {
+  await addUser(contract, newUser, identity2.publicKey, owner, identity.privateKey);
 });

@@ -15,6 +15,7 @@
     "clean": "./node_modules/.bin/rimraf ./build"
   },
   "jest": {
+    "setupFilesAfterEnv": ["./jest.setup.js"],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx,js,jsx}"
     ],
