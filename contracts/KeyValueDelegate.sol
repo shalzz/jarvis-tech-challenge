@@ -5,6 +5,10 @@ import "./UpgradeabilityProxy.sol";
 
 contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
+  event Authorized(address indexed user);
+  event Deauthorized(address indexed user);
+  event SecretSet(bytes name, bytes value);
+
   /**
    * @dev Throws if called by any account not authorized.
    */
@@ -35,6 +39,7 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
 
   function addSecret(bytes memory name, bytes memory value) public restricted {
     setSecret(name, value);
+    emit SecretSet(name, value);
   }
 
   /***** Helpers *****/
