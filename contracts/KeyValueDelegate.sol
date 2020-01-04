@@ -19,6 +19,11 @@ contract KeyValueDelegate is UpgradeabilityStorage, DelegateStorage {
   /**** IAM ****/
 
   function authorizeUser(address user, bytes memory encryptedSharedKey) public restricted {
+    require(
+      getEncSharedKey(user).length == 0,
+      "authorizeUser: user is already authorized"
+    );
+
     setEncSharedKey(user, encryptedSharedKey);
     emit Authorized(user);
   }

@@ -5,6 +5,7 @@
 import EthCrypto from 'eth-crypto';
 import Web3 from "web3";
 const TruffleContract = require("@truffle/contract");
+const assertRevert = require("../../test/support/assertRevert");
 
 import {
   createEncryptedSharedKey,
@@ -54,6 +55,10 @@ it("can create a new sharedKey", async () => {
 
 it("can add a new user", async () => {
   await addUser(contract, newUser, identity2.publicKey, owner, identity.privateKey);
+});
+
+it("cannot add a same user again", async () => {
+  await assertRevert(addUser(contract, newUser, identity2.publicKey, owner, identity.privateKey));
 });
 
 it("can add a new secret", async () => {

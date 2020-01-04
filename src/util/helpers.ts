@@ -21,7 +21,6 @@ export const addUser =
     const newUserEncryptedSharedKey = await EthCrypto.encryptWithPublicKey(newUserPublicKey, sharedKey);
     const bytes = Buffer.from(JSON.stringify(newUserEncryptedSharedKey));
 
-    // TODO: must fail if address exists already:
     await contract.authorizeUser(newUserAddress, bytes, { from: existingUserAddress});
 }
 
