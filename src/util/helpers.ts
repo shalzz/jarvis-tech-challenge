@@ -1,9 +1,10 @@
 import EthCrypto from 'eth-crypto';
 import CryptoJS from "crypto-js";
+import randomstring from "randomstring";
 
 export const createEncryptedSharedKey =
   async (identity) => {
-    const sharedKey = "random";
+    const sharedKey = randomstring.generate(12);
     const encryptedSharedKey = await EthCrypto.encryptWithPublicKey(identity.publicKey, sharedKey);
     return encryptedSharedKey;
 }
