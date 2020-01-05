@@ -1,7 +1,9 @@
 import * as React from "react";
 import Web3 from "web3";
 const TruffleContract = require("@truffle/contract");;
-//import {createEncryptedSharedKey} from "../util/helpers";
+import EthCrypto from 'eth-crypto';
+
+import {createEncryptedSharedKey} from "../util/helpers";
 
 const Delegate = TruffleContract(require("../../build/contracts/KeyValueDelegate.json"));
 const Proxy = TruffleContract(require("../../build/contracts/KeyValueProxy.json"));
@@ -44,9 +46,13 @@ export default class DeployContracts extends React.Component<IDeployContractsPro
     let instance: any;
 
     try {
+      const identity = EthCrypto.createIdentity();
       const store = await Storage.new({from: account});
       const delegate = await Delegate.new({from: account});
-      const proxy = await Proxy.new(store.address, Buffer.from("0"), {from: account});
+      const sharedKey = await createEncryptedSharedKey(identity);
+
+      const bytes = Buffer.from(JSON.stringify(sharedKey));
+      const proxy = await Proxy.new(store.address, bytes, {from: account});
 
       await store.upgradeVersion(proxy.address, {from: account});
       await proxy.upgradeTo("0.1", delegate.address, {from: account});
